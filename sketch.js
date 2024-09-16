@@ -2,7 +2,7 @@ let max_iter = 1000
 
 function setup() {
   createCanvas(600, 600);
-  background(0);
+  background(255);
   mandelbrot();
 }
 
@@ -10,9 +10,35 @@ function draw() {
 
 }
 
-function mandelbrot() {
+function colorize(iters) {
   loadPixels();
+  console.log("here");
+  let x = 0;
+  for (const arr of iters) {
+    let y = 0;
+    for (const n of arr) {
+      if (n == max_iter) {
+        pixels[(x + y * width) * 4] = 0;
+        pixels[(x + y * width) * 4 + 1] = 0;
+        pixels[(x + y * width) * 4 + 2] = 0;
+        pixels[(x + y * width) * 4 + 3] = 255;
+      } else {
+        pixels[(x + y * width) * 4] = 0;
+        pixels[(x + y * width) * 4 + 1] = 0;
+        pixels[(x + y * width) * 4 + 2] = 255 * sqrt(n / max_iter);
+        pixels[(x + y * width) * 4 + 3] = 255;
+      }
+      y++;
+    }
+    x++;
+  }
+  updatePixels();
+}
+
+function mandelbrot() {
+  let iterations = [];
   for (let x = 0; x < width; x++) {
+    iterations[x] = [];
     for (let y = 0; y < height; y++) {
       let a0 = map(x, 0, width, -2, 2);
       let b0 = map(y, 0, height, -2, 2);
@@ -30,13 +56,8 @@ function mandelbrot() {
         n++;
       }
 
-      if (n == max_iter) {
-        pixels[(x + y * width) * 4] = 255;
-        pixels[(x + y * width) * 4 + 1] = 255;
-        pixels[(x + y * width) * 4 + 2] = 255;
-        pixels[(x + y * width) * 4 + 3] = 255;
-      }
+      iterations[x][y] = n;
     }
   }
-  updatePixels();
+  colorize(iterations);
 }
