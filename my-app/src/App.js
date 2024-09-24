@@ -4,8 +4,11 @@ import './App.css';
 
 function App() {
   return (
-    <div className='App'>
-      <ReactP5Wrapper sketch={sketch}></ReactP5Wrapper>
+    <div>
+      <div className='App'>
+        <ReactP5Wrapper sketch={sketch}></ReactP5Wrapper>
+      </div>
+      <div> hi</div>
     </div>
   );
 }

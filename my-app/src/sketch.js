@@ -20,22 +20,21 @@ export default function sketch(p) {
     // Apply the camera transform
     vec4 viewModelPosition = uModelViewMatrix * vec4(aPosition, 1.0);
 
-    // Use the time to adjust the position of the vertices
-    viewModelPosition.x += 10.0 * sin(time * 0.01 + viewModelPosition.y * 0.1);
-
     // Tell WebGL where the vertex goes
     gl_Position = uProjectionMatrix * viewModelPosition;  
   }
   `;
 
   let frag = `
+  #ifdef GL_ES
   precision highp float;
+  #endif
 
   void main() {
     vec4 myColor = vec4(1.0, 0.0, 0.0, 1.0);
     gl_FragColor = myColor;
   }
-  `
+  `;
 
   p.setup = () => {
     p.createCanvas(p.windowWidth, p.windowHeight, p.WEBGL);
@@ -48,12 +47,8 @@ export default function sketch(p) {
     
     // Use our custom shader
     p.shader(myShader);
-    
-    // Create a color using the mouse's x position as red and
-    // its y position as blue, and pass it into the shader
-    myShader.setUniform('time', p.millis());
-    
+
     // Draw a shape using the shader
-    p.circle(0, 0, 100);
+    p.plane(p.windowWidth, p.windowHeight);
   }
 }
