@@ -1,65 +1,59 @@
-export default function sketch(p) { 
-  let max_iter = 1000;
+export default function sketch(p) {
+  let myShader;
+
+  // Our vertex shader source as a string
+  let vert = `
+  precision highp float;
+
+  attribute vec3 aPosition;
+
+  // The transform of the object being drawn
+  uniform mat4 uModelViewMatrix;
+
+  // Transforms 3D coordinates to 2D screen coordinates
+  uniform mat4 uProjectionMatrix;
+
+  // A custom uniform with the time in milliseconds
+  uniform float time;
+
+  void main() {
+    // Apply the camera transform
+    vec4 viewModelPosition = uModelViewMatrix * vec4(aPosition, 1.0);
+
+    // Use the time to adjust the position of the vertices
+    viewModelPosition.x += 10.0 * sin(time * 0.01 + viewModelPosition.y * 0.1);
+
+    // Tell WebGL where the vertex goes
+    gl_Position = uProjectionMatrix * viewModelPosition;  
+  }
+  `;
+
+  let frag = `
+  precision highp float;
+
+  void main() {
+    vec4 myColor = vec4(1.0, 0.0, 0.0, 1.0);
+    gl_FragColor = myColor;
+  }
+  `
 
   p.setup = () => {
-    p.createCanvas(600, 600);
-    p.background(255);
-    mandelbrot();
+    p.createCanvas(p.windowWidth, p.windowHeight, p.WEBGL);
+    myShader = p.createShader(vert, frag);
   }
 
   p.draw = () => {
-
-  }
-
-  function colorize(iters) {
-    p.loadPixels();
-    console.log("here");
-    let x = 0;
-    for (const arr of iters) {
-      let y = 0;
-      for (const n of arr) {
-        if (n === max_iter - 1) {
-          p.pixels[(x + y * p.width) * 4] = 0;
-          p.pixels[(x + y * p.width) * 4 + 1] = 0;
-          p.pixels[(x + y * p.width) * 4 + 2] = 0;
-          p.pixels[(x + y * p.width) * 4 + 3] = 255;
-        } else {
-          p.pixels[(x + y * p.width) * 4] = 255 * p.sqrt(n / max_iter);
-          p.pixels[(x + y * p.width) * 4 + 1] = 255 * p.sqrt(n / max_iter);
-          p.pixels[(x + y * p.width) * 4 + 2] = 255 * p.sqrt(n / max_iter);
-          p.pixels[(x + y * p.width) * 4 + 3] = 255;
-        }
-        y++;
-      }
-      x++;
-    }
-    p.updatePixels();
-  }
-
-  function mandelbrot() {
-    let iterations = [];
-    for (let x = 0; x < p.width; x++) {
-      iterations[x] = [];
-      for (let y = 0; y < p.height; y++) {
-        let a0 = p.map(x, 0, p.width, -2, 2);
-        let b0 = p.map(y, 0, p.height, -2, 2);
-        let a2 = 0
-        let b2 = 0
-        let a = 0
-        let b = 0
-        let n = 0
-
-        while (n < max_iter && a2 + b2 <= 4) {
-          b = (a + a) * b + b0;
-          a = a2 - b2 + a0;
-          a2 = p.pow(a, 2);
-          b2 = p.pow(b, 2);
-          n++;
-        }
-
-        iterations[x][y] = n - 1;
-      }
-    }
-    colorize(iterations);
+    p.background(255);
+    p.noStroke();
+    
+    // Use our custom shader
+    p.shader(myShader);
+    
+    // Create a color using the mouse's x position as red and
+    // its y position as blue, and pass it into the shader
+    myShader.setUniform('time', p.millis());
+    
+    // Draw a shape using the shader
+    p.circle(0, 0, 100);
   }
 }
