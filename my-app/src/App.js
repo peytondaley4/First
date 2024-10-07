@@ -5,10 +5,16 @@ import './App.css';
 function App() {
   return (
     <div>
-      <div className='App'>
-        <ReactP5Wrapper sketch={sketch}></ReactP5Wrapper>
+      <div className='Split Drawing'>
+        <div className='centered'>
+          <ReactP5Wrapper sketch={sketch}></ReactP5Wrapper>
+        </div>
       </div>
-      <div> hi</div>
+      <div className='Split Settings'>
+        <div className='centered'>
+          hi
+        </div>
+      </div>
     </div>
   );
 }
